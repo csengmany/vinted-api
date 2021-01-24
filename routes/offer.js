@@ -20,70 +20,86 @@ router.post("/offer/publish", isAuthenticated, async (req, res) => {
             city,
             color,
         } = req.fields;
-
-        if (title && price) {
-            //Créer une nouvelle annonce
-            const newOffer = new Offer({
-                product_name: title,
-                product_description: description,
-                product_price: price,
-                product_details: [
-                    {
-                        MARQUE: brand,
-                    },
-                    {
-                        TAILLE: size,
-                    },
-                    {
-                        ÉTAT: condition,
-                    },
-                    {
-                        COULEUR: color,
-                    },
-                    {
-                        EMPLACEMENT: city,
-                    },
-                ],
-                owner: req.user,
+        if (title.length > 50) {
+            res.status(400).json({
+                message: "Your title must be shorter",
             });
-            //Ajouter une image à l'annonce et l'envoyer à cloudinary
-            if (req.files.picture) {
-                const result = await cloudinary.uploader.upload(
-                    req.files.picture.path,
-                    { folder: `/vinted/offers/${newOffer._id}` }
-                );
-                newOffer.product_image = result;
-            }
-
-            await newOffer.save();
-
-            res.status(200).json({
-                _id: newOffer._id,
-                product_name: newOffer.product_name,
-                product_description: newOffer.product_description,
-                product_price: newOffer.product_price,
-                product_details: newOffer.product_details,
-                owner: {
-                    account: {
-                        username: newOffer.owner.account.username,
-                        phone: newOffer.owner.account.phone,
-                        avatar: {
-                            secrure_url:
-                                newOffer.owner.account.avatar.secure_url,
-                            original_filename:
-                                newOffer.owner.account.avatar.original_filename,
-                        },
-                    },
-                    _id: newOffer.owner._id,
-                },
-                product_image: {
-                    secure_url: newOffer.product_image.secure_url,
-                },
+        } else if (description.length > 500) {
+            res.status(400).json({
+                message: "Your description must be shorter",
+            });
+        } else if (Number(price) > 100000) {
+            res.status(400).json({
+                message: "You should put a lower price",
             });
         } else {
-            res.status(400).json({
-                message: "You must specify the name of the offer and the price",
-            });
+            if (title && price) {
+                //Créer une nouvelle annonce
+
+                const newOffer = new Offer({
+                    product_name: title,
+                    product_description: description,
+                    product_price: price,
+                    product_details: [
+                        {
+                            MARQUE: brand,
+                        },
+                        {
+                            TAILLE: size,
+                        },
+                        {
+                            ÉTAT: condition,
+                        },
+                        {
+                            COULEUR: color,
+                        },
+                        {
+                            EMPLACEMENT: city,
+                        },
+                    ],
+                    owner: req.user,
+                });
+                //Ajouter une image à l'annonce et l'envoyer à cloudinary
+                if (req.files.picture) {
+                    const result = await cloudinary.uploader.upload(
+                        req.files.picture.path,
+                        { folder: `/vinted/offers/${newOffer._id}` }
+                    );
+                    newOffer.product_image = result;
+                }
+
+                await newOffer.save();
+
+                res.status(200).json({
+                    _id: newOffer._id,
+                    product_name: newOffer.product_name,
+                    product_description: newOffer.product_description,
+                    product_price: newOffer.product_price,
+                    product_details: newOffer.product_details,
+                    owner: {
+                        account: {
+                            username: newOffer.owner.account.username,
+                            phone: newOffer.owner.account.phone,
+                            avatar: {
+                                secrure_url:
+                                    newOffer.owner.account.avatar.secure_url,
+                                original_filename:
+                                    newOffer.owner.account.avatar
+                                        .original_filename,
+                            },
+                        },
+                        _id: newOffer.owner._id,
+                    },
+                    product_image: {
+                        secure_url: newOffer.product_image.secure_url,
+                    },
+                });
+            } else {
+                res.status(400).json({
+                    message:
+                        "You must specify the name of the offer and the price",
+                });
+            }
         }
     } catch (error) {
         res.status(400).json({ error: error.message });
@@ -193,83 +209,100 @@ router.put("/offer/update/:id", isAuthenticated, async (req, res) => {
 
                 // si l'id du user correspond à l'id du owner il peut modifier l'offre
                 if (ownerId === userId) {
-                    if (req.fields.title) {
-                        offerToUpdate.product_name = req.fields.title;
-                    }
-                    if (req.fields.description) {
-                        offerToUpdate.product_description =
-                            req.fields.description;
-                    }
-                    if (req.fields.price) {
-                        offerToUpdate.product_price = req.fields.price;
-                    }
+                    if (req.fields.title.length > 50) {
+                        res.status(400).json({
+                            message: "Your title must be shorter",
+                        });
+                    } else if (req.fields.description.length > 500) {
+                        res.status(400).json({
+                            message: "Your description must be shorter",
+                        });
+                    } else if (Number(req.fields.price) > 100000) {
+                        res.status(400).json({
+                            message: "You should put a lower price",
+                        });
+                    } else {
+                        if (req.fields.title) {
+                            offerToUpdate.product_name = req.fields.title;
+                        }
+                        if (req.fields.description) {
+                            offerToUpdate.product_description =
+                                req.fields.description;
+                        }
+                        if (req.fields.price) {
+                            offerToUpdate.product_price = req.fields.price;
+                        }
 
-                    const details = offerToUpdate.product_details;
-                    for (i = 0; i < details.length; i++) {
-                        if (details[i].MARQUE) {
-                            if (req.fields.brand) {
-                                details[i].MARQUE = req.fields.brand;
-                            }
-                        }
-                        if (details[i].TAILLE) {
-                            if (req.fields.size) {
-                                details[i].TAILLE = req.fields.size;
-                            }
-                        }
-                        if (details[i].ÉTAT) {
-                            if (req.fields.condition) {
-                                details[i].ÉTAT = req.fields.condition;
-                            }
-                        }
-                        if (details[i].COULEUR) {
-                            if (req.fields.color) {
-                                details[i].COULEUR = req.fields.color;
-                            }
-                        }
-                        if (details[i].EMPLACEMENT) {
-                            if (req.fields.location) {
-                                details[i].EMPLACEMENT = req.fields.location;
-                            }
-                        }
-                    }
-
-                    // Notifie Mongoose que l'on a modifié le tableau product_details
-                    offerToUpdate.markModified("product_details");
-
-                    //si on modifie l'image
-                    if (req.files.picture) {
-                        if (
-                            offerToUpdate.product_image.public_id === undefined
-                        ) {
-                            //si l'offre n'avait pas d'image
-                            const result = await cloudinary.uploader.upload(
-                                req.files.picture.path,
-                                {
-                                    folder: `/vinted/offers/${offerToUpdate._id}`,
+                        const details = offerToUpdate.product_details;
+                        for (i = 0; i < details.length; i++) {
+                            if (details[i].MARQUE) {
+                                if (req.fields.brand) {
+                                    details[i].MARQUE = req.fields.brand;
                                 }
-                            );
-                            offerToUpdate.product_image = result;
-                        } else {
-                            //sinon on remplace l'image
-                            const result = await cloudinary.uploader.upload(
-                                req.files.picture.path,
-                                {
-                                    public_id:
-                                        offerToUpdate.product_image.public_id,
-                                    overwrite: true,
+                            }
+                            if (details[i].TAILLE) {
+                                if (req.fields.size) {
+                                    details[i].TAILLE = req.fields.size;
                                 }
-                            );
-                            offerToUpdate.product_image = result;
+                            }
+                            if (details[i].ÉTAT) {
+                                if (req.fields.condition) {
+                                    details[i].ÉTAT = req.fields.condition;
+                                }
+                            }
+                            if (details[i].COULEUR) {
+                                if (req.fields.color) {
+                                    details[i].COULEUR = req.fields.color;
+                                }
+                            }
+                            if (details[i].EMPLACEMENT) {
+                                if (req.fields.location) {
+                                    details[i].EMPLACEMENT =
+                                        req.fields.location;
+                                }
+                            }
                         }
+
+                        // Notifie Mongoose que l'on a modifié le tableau product_details
+                        offerToUpdate.markModified("product_details");
+
+                        //si on modifie l'image
+                        if (req.files.picture) {
+                            if (
+                                offerToUpdate.product_image.public_id ===
+                                undefined
+                            ) {
+                                //si l'offre n'avait pas d'image
+                                const result = await cloudinary.uploader.upload(
+                                    req.files.picture.path,
+                                    {
+                                        folder: `/vinted/offers/${offerToUpdate._id}`,
+                                    }
+                                );
+                                offerToUpdate.product_image = result;
+                            } else {
+                                //sinon on remplace l'image
+                                const result = await cloudinary.uploader.upload(
+                                    req.files.picture.path,
+                                    {
+                                        public_id:
+                                            offerToUpdate.product_image
+                                                .public_id,
+                                        overwrite: true,
+                                    }
+                                );
+                                offerToUpdate.product_image = result;
+                            }
+                        }
+                        await offerToUpdate.save();
+                        res.status(200).json({
+                            "Offer is updated ✅": {
+                                product_name: offerToUpdate,
+                                //.product_name,
+                                //id: offerToUpdate._id,
+                            },
+                        });
                     }
-                    await offerToUpdate.save();
-                    res.status(200).json({
-                        "Offer is updated ✅": {
-                            product_name: offerToUpdate,
-                            //.product_name,
-                            //id: offerToUpdate._id,
-                        },
-                    });
                 }
             } else {
                 res.status(400).json({
