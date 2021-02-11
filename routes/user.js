@@ -14,8 +14,9 @@ router.post("/user/signup", async (req, res) => {
         if (
             req.fields.email &&
             req.fields.username &&
-            req.fields.password &&
-            req.fields.phone
+            req.fields.password
+            // &&
+            // req.fields.phone
         ) {
             // Rechercher dans la BDD si un user possède déjà cet email
             const user = await User.findOne({ email: req.fields.email });
@@ -42,20 +43,20 @@ router.post("/user/signup", async (req, res) => {
                         account: {
                             username: req.fields.username,
                             phone: req.fields.phone,
-                            avatar: req.files.avatar.path,
+                            // avatar: req.files.avatar.path,
                         },
                         token: token,
                         hash: hash,
                         salt: salt,
                     });
-                    //Ajouter un avatar
-                    const result = await cloudinary.uploader.upload(
-                        newUser.account.avatar,
-                        {
-                            folder: `/vinted/user/"${newUser._id}`,
-                        }
-                    );
-                    newUser.account.avatar = result;
+                    // Ajouter un avatar
+                    // const result = await cloudinary.uploader.upload(
+                    //     newUser.account.avatar,
+                    //     {
+                    //         folder: `/vinted/user/"${newUser._id}`,
+                    //     }
+                    // );
+                    // newUser.account.avatar = result;
 
                     // étape 3 :sauvegarder l'utilisateur
                     await newUser.save();
@@ -68,11 +69,11 @@ router.post("/user/signup", async (req, res) => {
                         account: {
                             username: newUser.account.username,
                             phone: newUser.account.phone,
-                            avatar: {
-                                secure_url: newUser.account.avatar.secure_url,
-                                original_filename:
-                                    newUser.account.avatar.original_filename,
-                            },
+                            // avatar: {
+                            //     secure_url: newUser.account.avatar.secure_url,
+                            //     original_filename:
+                            //         newUser.account.avatar.original_filename,
+                            // },
                         },
                     });
                 } else {
