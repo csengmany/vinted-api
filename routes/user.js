@@ -78,17 +78,17 @@ router.post("/user/signup", async (req, res) => {
                     });
                 } else {
                     res.status(400).json({
-                        message: "Change username, it is already used ❌",
+                        message: "Change username, it is already used ⚠️",
                     });
                 }
             } else {
                 res.status(400).json({
-                    message: "This email already has an account ❌",
+                    message: "This email already has an account ⚠️",
                 });
             }
         } else {
             res.status(400).json({
-                message: "Missing parameters ❌",
+                message: "Missing parameters ⚠️",
             });
         }
     } catch (error) {
@@ -117,10 +117,10 @@ router.post("/user/login", async (req, res) => {
                 });
             } else {
                 //Sinon => Erreur
-                res.status(401).json({ message: "Unauthorized ❌" });
+                res.status(401).json({ message: "Unauthorized ⚠️" });
             }
         } else {
-            res.status(401).json({ message: "Unauthorized ❌" });
+            res.status(401).json({ message: "Unauthorized ⚠️" });
         }
     } catch (error) {
         res.status(400).json({ message: error.message });

@@ -80,13 +80,13 @@ router.post("/offer/publish", isAuthenticated, async (req, res) => {
                         account: {
                             username: newOffer.owner.account.username,
                             phone: newOffer.owner.account.phone,
-                            avatar: {
-                                secrure_url:
-                                    newOffer.owner.account.avatar.secure_url,
-                                original_filename:
-                                    newOffer.owner.account.avatar
-                                        .original_filename,
-                            },
+                            // avatar: {
+                            //     secrure_url:
+                            //         newOffer.owner.account.avatar.secure_url,
+                            //     original_filename:
+                            //         newOffer.owner.account.avatar
+                            //             .original_filename,
+                            // },
                         },
                         _id: newOffer.owner._id,
                     },
@@ -143,8 +143,8 @@ router.get("/offers", async (req, res) => {
         // forcer à afficher la page 1 si la query page n'est pas envoyée ou est envoyée avec 0 ou < -1
         if (req.query.page < 1) {
             page = 1;
-        } else if (req.query.page > Math.round(count / limit)) {
-            page = Math.round(count / limit);
+        } else if (req.query.page > Math.ceil(count / limit)) {
+            page = Math.ceil(count / limit);
         } else {
             // sinon, page est égale à ce qui est demandé
             page = Number(req.query.page);

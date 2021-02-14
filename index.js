@@ -7,7 +7,9 @@ require("dotenv").config();
 const cors = require("cors");
 
 const app = express();
-app.use(formidable());
+
+//{ multiples: true } il faut cette option pour permettre l'upload de plusieurs fichiers
+app.use(formidable({ multiples: true }));
 app.use(cors());
 
 mongoose.connect(process.env.MONGODB_URI, {
