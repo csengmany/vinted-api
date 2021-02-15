@@ -43,20 +43,20 @@ router.post("/user/signup", async (req, res) => {
                         account: {
                             username: req.fields.username,
                             phone: req.fields.phone,
-                            // avatar: req.files.avatar.path,
+                            avatar: req.files.avatar.path,
                         },
                         token: token,
                         hash: hash,
                         salt: salt,
                     });
                     // Ajouter un avatar
-                    // const result = await cloudinary.uploader.upload(
-                    //     newUser.account.avatar,
-                    //     {
-                    //         folder: `/vinted/user/"${newUser._id}`,
-                    //     }
-                    // );
-                    // newUser.account.avatar = result;
+                    const result = await cloudinary.uploader.upload(
+                        newUser.account.avatar,
+                        {
+                            folder: `/vinted/user/"${newUser._id}`,
+                        }
+                    );
+                    newUser.account.avatar = result;
 
                     // étape 3 :sauvegarder l'utilisateur
                     await newUser.save();
@@ -69,11 +69,11 @@ router.post("/user/signup", async (req, res) => {
                         account: {
                             username: newUser.account.username,
                             phone: newUser.account.phone,
-                            // avatar: {
-                            //     secure_url: newUser.account.avatar.secure_url,
-                            //     original_filename:
-                            //         newUser.account.avatar.original_filename,
-                            // },
+                            avatar: {
+                                secure_url: newUser.account.avatar.secure_url,
+                                original_filename:
+                                    newUser.account.avatar.original_filename,
+                            },
                         },
                     });
                 } else {

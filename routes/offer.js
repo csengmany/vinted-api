@@ -80,13 +80,13 @@ router.post("/offer/publish", isAuthenticated, async (req, res) => {
                         account: {
                             username: newOffer.owner.account.username,
                             phone: newOffer.owner.account.phone,
-                            // avatar: {
-                            //     secrure_url:
-                            //         newOffer.owner.account.avatar.secure_url,
-                            //     original_filename:
-                            //         newOffer.owner.account.avatar
-                            //             .original_filename,
-                            // },
+                            avatar: {
+                                secrure_url:
+                                    newOffer.owner.account.avatar.secure_url,
+                                original_filename:
+                                    newOffer.owner.account.avatar
+                                        .original_filename,
+                            },
                         },
                         _id: newOffer.owner._id,
                     },
