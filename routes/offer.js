@@ -138,17 +138,26 @@ router.get("/offers", async (req, res) => {
         const count = await Offer.countDocuments(filters);
         let limit = Number(req.query.limit);
 
-        // numero de page par défaut et limite de produit par page
+        // // numero de page par défaut et limite de produit par page
+        // let page;
+        // // forcer à afficher la page 1 si la query page n'est pas envoyée ou est envoyée avec 0 ou < -1
+        // if (req.query.page < 1) {
+        //     page = 1;
+        // } else if (req.query.page > Math.ceil(count / limit)) {
+        //     page = Math.ceil(count / limit);
+        // } else {
+        //     // sinon, page est égale à ce qui est demandé
+        //     page = Number(req.query.page);
+        // }
+
         let page;
-        // forcer à afficher la page 1 si la query page n'est pas envoyée ou est envoyée avec 0 ou < -1
-        if (req.query.page < 1) {
+        if (Number(req.query.page) < 1) {
             page = 1;
-        } else if (req.query.page > Math.ceil(count / limit)) {
-            page = Math.ceil(count / limit);
         } else {
-            // sinon, page est égale à ce qui est demandé
             page = Number(req.query.page);
         }
+
+        limit = Number(req.query.limit);
 
         const offers = await Offer.find(filters)
             .select(
