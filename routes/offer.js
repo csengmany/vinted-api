@@ -33,7 +33,7 @@ router.post("/offer/publish", isAuthenticated, async (req, res) => {
                 message: "You should put a lower price",
             });
         } else {
-            if (title && price) {
+            if (title && price && req.files.picture) {
                 //Créer une nouvelle annonce
 
                 const newOffer = new Offer({
@@ -97,7 +97,7 @@ router.post("/offer/publish", isAuthenticated, async (req, res) => {
             } else {
                 res.status(400).json({
                     message:
-                        "You must specify the name of the offer and the price",
+                        "You must specify the name of the offer, the price and the picture of your offer",
                 });
             }
         }
