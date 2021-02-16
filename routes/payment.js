@@ -14,14 +14,14 @@ app.use(cors());
 router.post("/payment", async (req, res) => {
     try {
         // Réception du token créer via l'API Stripe depuis le Frontend
-        const stripeToken = req.fields.stripeToken;
+
         // Créer la transaction
         const response = await stripe.charges.create({
-            amount: req.fields.amount * 100,
+            amount: 20 * 100, //req.fields.amount
             currency: "eur",
-            description: `Paiement effectuer sur Vinted pour ${req.fields.name}`,
+            description: `Paiement effectuer sur Vinted pour `, //${req.fields.name},
             // On envoie ici le token
-            source: stripeToken,
+            source: req.fields.stripeToken,
         });
         console.log(response.status);
         // TODO
