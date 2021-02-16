@@ -17,9 +17,9 @@ router.post("/payment", async (req, res) => {
 
         // Créer la transaction
         const response = await stripe.charges.create({
-            amount: 20 * 100, //req.fields.amount
+            amount: req.fields.amount * 100,
             currency: "eur",
-            description: `Paiement effectuer sur Vinted pour `, //${req.fields.name},
+            description: `Paiement effectuer sur Vinted pour ${req.fields.name}`,
             // On envoie ici le token
             source: req.fields.stripeToken,
         });
